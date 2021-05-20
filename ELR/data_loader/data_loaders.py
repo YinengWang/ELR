@@ -4,9 +4,38 @@ from torchvision import datasets, transforms
 from base import BaseDataLoader
 from data_loader.cifar10 import get_cifar10
 from data_loader.cifar100 import get_cifar100
+from data_loader.cdon import get_cdon
 from parse_config import ConfigParser
 from PIL import Image
 
+
+class CDONDataLoader(BaseDataLoader):
+    def __init__(self, data_dir, batch_size, shuffle=True, validation_split=0.0, num_batches=0,  training=True, num_workers=4,  pin_memory=True):
+        config = ConfigParser.get_instance()
+        cfg_trainer = config['trainer']
+        
+        transform_train = transforms.Compose([
+            transforms.Resize(32),
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        transform_val = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        self.data_dir = data_dir
+        
+        self.train_dataset, self.val_dataset = get_cdon(config['data_loader']['args']['data_dir'], cfg_trainer, train=training,
+                                                           transform_train=transform_train, transform_val=transform_val)
+
+        super().__init__(self.train_dataset, batch_size, shuffle, validation_split, num_workers, pin_memory,
+                         val_dataset = self.val_dataset)
+
+    def run_loader(self, batch_size, shuffle, validation_split, num_workers, pin_memory):
+        super().__init__(self.train_dataset, batch_size, shuffle, validation_split, num_workers, pin_memory,
+                         val_dataset = self.val_dataset)
 
 class CIFAR10DataLoader(BaseDataLoader):
     def __init__(self, data_dir, batch_size, shuffle=True, validation_split=0.0, num_batches=0,  training=True, num_workers=4,  pin_memory=True):
