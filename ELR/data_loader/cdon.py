@@ -23,24 +23,6 @@ def get_cdon(root, cfg_trainer, train=True,
     
     return train_dataset, val_dataset
 
-
-def train_val_split(base_dataset: torchvision.datasets.CIFAR10):
-    num_classes = 10
-    base_dataset = np.array(base_dataset)
-    train_n = int(len(base_dataset) * 0.9 / num_classes)
-    train_idxs = []
-    val_idxs = []
-
-    for i in range(num_classes):
-        idxs = np.where(base_dataset == i)[0]
-        np.random.shuffle(idxs)
-        train_idxs.extend(idxs[:train_n])
-        val_idxs.extend(idxs[train_n:])
-    np.random.shuffle(train_idxs)
-    np.random.shuffle(val_idxs)
-
-    return train_idxs, val_idxs
-
         
 class CDONdataset(Dataset):
     def __init__(self, csv_file, root_dir, transform=None):

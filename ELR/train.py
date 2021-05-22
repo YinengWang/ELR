@@ -46,8 +46,8 @@ def main(config: ConfigParser):
     )
 
 
-    valid_data_loader = data_loader.split_validation()
-
+    # valid_data_loader = data_loader.split_validation()
+    valid_data_loader = None
     # test_data_loader = None
 
     test_data_loader = getattr(module_data, config['data_loader']['type'])(
@@ -57,7 +57,7 @@ def main(config: ConfigParser):
         validation_split=0.0,
         training=False,
         num_workers=2
-    ).split_validation()
+    )#.split_validation()
 
 
     # build model architecture, then print to console
